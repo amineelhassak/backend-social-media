@@ -1,24 +1,33 @@
-    const mongoose = require('mongoose');
+const mongoose = require('mongoose');
+const autoIncrement = require('mongoose-auto-increment');
+autoIncrement.initialize(mongoose.connection);
 const schemaposts = new mongoose.Schema({
-    description:{
+    id: {
+        type: Number,
+        unique: true,
+    },
+    description: {
         type: String,
     },
-    username:{
+    username: {
         type: 'string',
         // unique: true,
     },
-    date:{
-        type:Date,
+    date: {
+        type: Date,
     },
-    commantaire:[{type:mongoose.Schema.Types.ObjectId,ref:"commantaire"}],
-    nlikes:{
-        type : Number,
+    commantaire: [{ type: mongoose.Schema.Types.ObjectId, ref: "commantaire" }],
+    nlikes: {
+        type: Number,
         default: 0,
     },
-    // nfavorites:{
-    //     type : Number,
-    //     default: 0,
-    // }
-})
-const Schemaposts= mongoose.model("posts", schemaposts);
+});
+schemaposts.plugin(autoIncrement.plugin, {
+    model: 'posts',
+    field: 'id',
+    startAt: 1,
+    incrementBy: 1,
+});
+
+const Schemaposts = mongoose.model("posts", schemaposts);
 module.exports = Schemaposts;

@@ -1,1 +1,92 @@
-//
+// Create:
+// Use to create new documents in a collection
+// Example:
+const user = await users.create({
+    username: req.user.username
+});
+user.save(); // Save modifications using save()
+
+// Find:
+// Used to find documents in a collection
+// Example:
+await users.find();
+
+// findOneAndDelete:
+// Searches for a document and deletes it
+// Example:
+const deletedUser = await users.findOneAndDelete({ username: 'example' });
+
+// deleteMany:
+// Used to delete multiple documents in a collection
+// Examples:
+// Delete all documents:
+await users.deleteMany();
+
+// Delete documents with a specific condition:
+await users.deleteMany({ title: "amine" });
+
+// findOne:
+// Used to search for a document in a collection
+// Example:
+const user = await users.findOne({ username: req.params.username });
+
+// findOneAndReplace:
+// Searches for a document in a collection, replaces it, and returns the updated document
+// Example:
+const updatedUser = await users.findOneAndReplace(
+    { username: req.params.username },
+    { username: req.body.username },
+    { new: true }
+);
+
+// push:
+// Used to add an element to an array
+// Example:
+user.posts.push(post._id);
+
+// filter:
+// Used to filter elements in an array
+// Example:
+usr.posts = usr.posts.filter((elm) => elm._id != req.params.id);
+
+// findByIdAndDelete:
+// Example:
+const user = await users.findOne({ username: req.params.username });
+user.posts.map(async (elm) => {
+    await posts.findByIdAndDelete(elm);
+});
+
+// Bash Commands:
+// - Create a database:
+//   Use name-db
+//   Show dbs
+
+// - Create a collection in the database:
+//   db.createCollection('name collection')
+
+// - Show collections:
+//   show collections
+
+// - Add an element to a collection:
+//   db.name_collection.insert({ object: 'node js' })
+
+// - Display information of a collection:
+//   db.name_collection.find({})
+
+// - Drop a database:
+//   d.dropDatabase()
+
+// - Run Node.js with Nodemon:
+//   npx nodemon app.js
+
+// - Start MongoDB with a specific data directory:
+//   mongod --dbpath=/Users/b/Desktop/data/db
+
+// - Initialize a new Node.js project:
+//   npm init
+
+// - Install a package:
+//   npm install package_name
+
+// - Uninstall a package:
+//   npm uninstall package_name

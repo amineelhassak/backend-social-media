@@ -101,7 +101,7 @@ const { json } = require('body-parser');
         try {
             const usr = await users.findOne({ username: req.params.username }).populate("posts");
             if (usr) {
-                const foundPost = usr.posts.find((elm) => elm._id == req.params.id);
+                const foundPost = usr.posts.findOne((elm) => elm._id == req.params.id);
                 if (foundPost) {
                     res.status(200).json({ post: foundPost, message: 'Successfully found!' });
                 } else

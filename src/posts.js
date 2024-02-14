@@ -38,8 +38,7 @@ const { json } = require('body-parser');
                 console.log("User not found!");
                 res.status(404).json({ error: 'user not found' });
             }
-        }catch(error)
-        {
+        }catch(error){
             console.error('Internal Server Error:', error);
             res.status(500).json({ error: 'Internal Server Error' });
         }
@@ -59,12 +58,38 @@ const { json } = require('body-parser');
         }
     })
     Router.route('/users/:username/posts/:id')
-    .put((req,res)=>{
-
+    .put(async (req,res)=>{
+        try{
+            const usr = await users.findOne({username: req.params.username});
+            if (!usr){
+                res.status(404).send({message:"user not found !"});
+                console.log("user not found!");
+                return ;
+            }
+            const post = await posts.findOneAndUpdate({_id:req.params.id},{
+                username:req.body.username,
+                description:req.body.description,
+                date:req.body.date
+            },{new:true});
+            if (!post){
+                res.status(404).send({message:"post not found !"});
+                console.log("post not found!");
+                return ;
+            }
+            res.status(200).send({message:"update post successfully",post});
+        }catch(error){
+            console.error('Internal Server Error:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
     }).delete(async (req,res)=>{
         try{
             await posts.findOneAndDelete({_id: req.params.id});
             const usr = await users.findOne({username: req.params.username});
+            if (!usr){
+                res.status(404).send({message:"user not found !"});
+                console.log("user not found!");
+                return ;
+            }
             usr.posts = usr.posts.filter((elm) => elm._id != req.params.id);
             await usr.save();
             res.status(200).json("success!");

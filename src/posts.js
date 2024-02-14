@@ -1,24 +1,25 @@
-const express = require('express');
-    const Router = express.Router();
+const express = require('express');    const Router = express.Router();
     const posts = require('../models/postes');
     const users = require('../models/users');
 const { json } = require('body-parser');
     Router.route('/users/:username/posts')
     .post(async (req, res) => {
         try{
-            const userr = await users.findOne({username : req.params.username});
-            const post = await posts.create({
-                description: req.body.description,
-                username: req.params.username,
-                date: Date.now(),
-            })
-            console.log("User created!");
-            await post.save();
-            console.log("Use saved!");
             const user = await users.findOne({username: req.params.username});
+            if(!user) {
+                console.error("User not found");
+                res.status(404).send({message: "User not found"});
+                return;
+            }
             if (user){
+                const post = await posts.create({
+                    username: req.params.username,
+                })
+                console.log("User created!");
+                await post.save();
+                console.log("Use saved!");
                     console.log("User found!");
-                    user.posts.push(post);
+                    user.posts.push(post._id);
                     await user.save();
                     console.log("Use saved id in user !");
             }
@@ -30,7 +31,13 @@ const { json } = require('body-parser');
     }).get(async (req,res)=>{
         try{
             const user = await users.findOne({username : req.params.username}).populate("posts");;
-            res.status(200).json(user);
+            if (user){
+                console.log("User found!");
+                res.status(200).json(user.posts);
+            }else{
+                console.log("User not found!");
+                res.status(404).json({ error: 'user not found' });
+            }
         }catch(error)
         {
             console.error('Internal Server Error:', error);
@@ -53,15 +60,13 @@ const { json } = require('body-parser');
     })
     Router.route('/users/:username/posts/:id')
     .put((req,res)=>{
-        
+
     }).delete(async (req,res)=>{
         try{
-            await posts.findOneAndDelete({id: req.params.id});
-            // const usr = await users.findOne({username: req.params.username});
-            // usr.posts.map((elm)=>{
-            //     if(elm.id != req.params.id)
-            //         usr.posts.push(elm);
-            // });
+            await posts.findOneAndDelete({_id: req.params.id});
+            const usr = await users.findOne({username: req.params.username});
+            usr.posts = usr.posts.filter((elm) => elm._id != req.params.id);
+            await usr.save();
             res.status(200).json("success!");
         }catch(error){
             console.error('Internal Server Error:', error);
@@ -71,7 +76,7 @@ const { json } = require('body-parser');
         try {
             const usr = await users.findOne({ username: req.params.username }).populate("posts");
             if (usr) {
-                const foundPost = usr.posts.find((elm) => elm.id == req.params.id);
+                const foundPost = usr.posts.find((elm) => elm._id == req.params.id);
                 if (foundPost) {
                     res.status(200).json({ post: foundPost, message: 'Successfully found!' });
                 } else
